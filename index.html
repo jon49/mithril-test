@@ -1,13 +1,13 @@
 <!doctype html>
 
 <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
-<!--<script src="mithril.js"></script>-->
-<script src="mithril_next.js"></script>
+<script src="mithril.js"></script>
+<!--<script src="mithril_next.js"></script>-->
 <script src="jquery.js"></script>
 <script>
 
 var fadeIn = function(e, isInit){
-   if (!isInit) 
+   if (!isInit)
       $(e).delay(250).fadeIn(1000)
 }
 
@@ -45,15 +45,19 @@ var resetButton = function(ctrl){
    return m('button', {onclick:reset.bind(ctrl)}, 'reset')
 } 
 
-var item = function(item){
-    return m('div#id' + item.id, {style: {'background-color': 'DarkSeaGreen', width: '100px', height:'50px', display: 'none'}, config: fadeIn}, item.name)
+var item = function(item, hideMe){
+   if (hideMe)
+      return m('div#id' + item.id, {style: {'background-color': 'DarkSeaGreen', width: '100px', height:'50px', display: 'none'}, config: fadeIn}, item.name)
+   else
+      return m('div#id' + item.id, {style: {'background-color': 'DarkSeaGreen', width: '100px', height:'50px'}}, item.name)
+      
 }
 var list = function(ctrl){
     return m('.items',
              _(ctrl.showList)
              .sortBy('id')
              .map(function(i){
-                 return item(i)
+                 return item(i, _.isEqual(i.id, _.last(ctrl.showList).id))
              })
              .value())
 }
