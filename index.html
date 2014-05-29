@@ -11,7 +11,7 @@ var fadeIn = function(e, isInit){
       $(e).delay(250).fadeIn(1000)
 }
 
-var items = [{id:0, name:'item 1'}, {id:1, name:'item  2'}, {id:2, name:'item3'}, {id:3, name:'item 4'}, {id:4, name:'item 5'}, {id:5, name:'item 6'}, {id:6, name:'item 7'}, {id:7, name:'item 8'}, {id:8, name:'item 9'}]
+var items = [{id:0, name:'item 1', state: {in: ''}, color: 'DarkSeaGreen'}, {id:1, name:'item  2', state: {in: ''}, color: 'lightBlue'}, {id:2, name:'item3', state: {in: ''}, color: 'lightgrey'}]
 
 function controller(){
     this.list = items
@@ -31,11 +31,22 @@ var reset = function(){
    this.list = items
    this.showList = []
 }
+
+var isIn = function(i){
+   return _.has(i.state, 'in')
+}
+
+var toggle = function(){
+   if (isIn(this))
+      _.assign(this, {state: {out: ''}})
+   else
+      _.assign(this, {state: {in: ''}})
+}
    
-var body = m('body', {style: {width:'600px', margin: '0 auto', 'margin-bottom': '100px'}})
+var body = m('body', {style: {width:'600px', margin: '0 auto'}})
 
 var header = function(ctrl){
-    return m('header', 'This is a header')
+    return m('header', 'Switch Boxes')
 }
 
 var btn = function(ctrl){
@@ -46,19 +57,39 @@ var resetButton = function(ctrl){
 } 
 
 var item = function(item){
-    return m('div#id' + item.id, {style: {'background-color': 'DarkSeaGreen', width: '100px', height:'50px', display: 'none'}, config: fadeIn}, item.name)
+    return m('div#id' + item.id, {style: {'background-color': item.color, width: '100px', height:'50px'}, config: fadeIn, onclick: toggle.bind(item)}, item.name + isIn(item))
 }
-var list = function(ctrl){
+var list = _.curry(function(inOut, ctrl){
     return m('.items',
              _(ctrl.showList)
+             .tap(function(a){
+                var b = a
+             })
+             .filter(function(i){
+                return _.has(i.state, inOut)
+             })
+             .tap(function(a){
+                var b = a
+             })
              .sortBy('id')
+             .tap(function(a){
+                var b = a
+             })
              .map(function(i){
                  return item(i)
              })
+             .tap(function(a){
+                var b = a
+             })
              .value())
-}
+})
+
+var listIn = list('in')
+var listOut = list('out')
+
 var main = function(ctrl){
-    return [body, header(ctrl), btn(ctrl), resetButton(ctrl), list(ctrl)]
+   var result = [body, header(ctrl), btn(ctrl), resetButton(ctrl), listIn(ctrl), m('hr'), listOut(ctrl)]
+   return result
 }
 m.module(document, {view:main, controller:controller})
 </script>
